@@ -3,19 +3,7 @@ import './App.css';
 import React from 'react';
 import { Button } from 'react-bootstrap';
 
-// See https://en.wikipedia.org/wiki/Harvard_sentences
-const harvardSentences = [
-  'Oak is strong and also gives shade.',
-  'Cats and dogs each hate the other.',
-  'The pipe began to rust while new.',
-  'Open the crate but don\'t break the glass.',
-  'Add the sum to the product of these three.',
-  'Thieves who rob friends deserve jail.',
-  'The ripe taste of cheese improves with age.',
-  'Act on these orders with great speed.',
-  'The hog crawled under the high fence.',
-  'Move the vat over the hot fire.',
-];
+import harvardSentences from './sentences.json';
 
 function App() {
   const [isRecording, setIsRecording] = React.useState(false);
