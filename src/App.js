@@ -1,7 +1,7 @@
 import './App.css';
 
 import React from 'react';
-import { Button, Table } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 // See https://en.wikipedia.org/wiki/Harvard_sentences
 const harvardSentences = [
