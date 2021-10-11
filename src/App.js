@@ -9,6 +9,13 @@ function App() {
   const [isRecording, setIsRecording] = React.useState(false);
   const [recordings, setRecordings] = React.useState([]);
   const [mediaRecorder, setMediaRecorder] = React.useState();
+  const [devices, setDevices] = React.useState([]);
+
+  React.useEffect(() => {
+    navigator.mediaDevices.enumerateDevices().then((devices) => {
+      setDevices(devices);
+    });
+  }, []);
 
   const sentence = React.useMemo(() => {
     const randNum = Math.random() * harvardSentences.length;
@@ -19,6 +26,11 @@ function App() {
 
   const startRecording = React.useCallback(() => {
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      const tracks = stream.getTracks();
+      const deviceId = tracks[0].getSettings().deviceId;
+
+      const device = devices.find((d) => d.deviceId === deviceId);
+
       setIsRecording(true);
 
       // Create a new media recorder from the navigator's
@@ -40,6 +52,7 @@ function App() {
         // Add new recording to list of recordings.
         setRecordings((prevState) => [...prevState, {
           timestamp: Date.now(),
+          name: device.label || 'Default',
           url: audioURL,
         }]);
 
@@ -56,7 +69,7 @@ function App() {
       // Start recording audio.
       recorder.start();
     });
-  }, []);
+  }, [devices]);
 
   const stopRecording = React.useCallback(() => {
     setIsRecording(false);
@@ -78,6 +91,22 @@ function App() {
     setRecordings([]);
   }, []);
 
+  if (!devices.length) {
+    return (
+      <div className="container py-5">
+        <div className="row">
+          <div className="col-12 col-md-8 col-xl-5">
+            <div className="row">
+              <div className="col">
+                Loading devices…
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container py-5">
       <div className="row">
@@ -91,15 +120,22 @@ function App() {
               <p className="text-muted">Can't think of anything to say? Try this: <strong>{sentence}</strong></p>
             </div>
           </div>
-          {recordings.map(({ timestamp, url }) => (
-            <div className="row pt-3" key={timestamp}>
-              <div className="col">
-                <audio controls>
-                  <source src={url} />
-                </audio>
-              </div>
+          {recordings.length > 0 && (
+            <div className="pb-3">
+              {recordings.map(({ timestamp, url, name }) => (
+                <div className="row pt-3" key={timestamp}>
+                  <div className="col">
+                    <p className="mb-1 text-muted">
+                      <small>{name}</small>
+                    </p>
+                    <audio controls>
+                      <source src={url} />
+                    </audio>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
           <div className="row pt-3">
             <div className="col">
               <Button variant="danger" onClick={toggleRecording}>
